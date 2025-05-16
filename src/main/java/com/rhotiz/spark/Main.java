@@ -30,61 +30,59 @@ public class Main {
     }
 
 
-    public static boolean isValidIranianNationalCode(String nationalCode) {
+    public static boolean isValidIranianNationalCode(String nc) {
         // Check if the input is null or empty
-        if (nationalCode == null || nationalCode.trim().isEmpty()) {
+        if (nc != null && !nc.trim().isEmpty()) {
+
+            // Remove any non-digit characters
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < nc.length(); i++) {
+                char c = nc.charAt(i);
+                if (c != '-' && c != ' ') {
+                    sb.append(c);
+                }
+            }
+            nc = sb.toString();
+
+
+            if (nc.length() == 10) { // Check length (should be 10 digits)
+                for (int i = 0; i < nc.length(); i++) {
+                    char c = nc.charAt(i);
+                    if (c < '0' || c > '9') {
+                        System.out.println("National code can only contain digits");
+                        return false;
+                    }
+                }
+
+                // Calculate the checksum
+                int sum = 0;
+                for (int i = 0; i < 9; i++) {
+                    int digit = Character.getNumericValue(nc.charAt(i));
+                    sum += digit * (10 - i);
+                }
+
+                int remainder = sum % 11;
+                int calculatedChecksum;
+                if (remainder < 2) {
+                    calculatedChecksum = remainder;
+                } else {
+                    calculatedChecksum = (11 - remainder);
+                }
+
+                if (calculatedChecksum == Character.getNumericValue(nc.charAt(9))) {
+                    return true;
+                }
+                System.out.println("Invalid National code");
+                return false;
+            } else {
+                System.out.println("Only 10 digit national codes are valid.");
+                return false;
+            }
+
+        } else {
             System.out.println("Entered national code is empty.");
             return false;
         }
-
-        // Remove any non-digit characters
-        StringBuilder dashAndSpaceRemoved = new StringBuilder();
-        for (int i = 0; i < nationalCode.length(); i++) {
-            char c = nationalCode.charAt(i);
-            if (c != '-' && c != ' ') {
-                dashAndSpaceRemoved.append(c);
-            }
-        }
-        nationalCode = dashAndSpaceRemoved.toString();
-
-        // Check length (should be 10 digits)
-        if (nationalCode.length() != 10) {
-            System.out.println("Only 10 digit national codes are valid.");
-            return false;
-        }
-
-        for (int i = 0; i < nationalCode.length(); i++) {
-            char c = nationalCode.charAt(i);
-            if (c < '0' || c > '9') {
-                System.out.println("National code can only contain digits");
-                return false;
-            }
-        }
-
-        // Calculate the checksum
-        int sum = 0;
-        for (int i = 0; i < 9; i++) {
-            int digit = Character.getNumericValue(nationalCode.charAt(i));
-            int nextSum = digit * (10 - i);
-            sum += nextSum;
-        }
-
-        int remainder = sum % 11;
-
-
-        int calculatedValidDigit;
-
-        if (remainder < 2) {
-            calculatedValidDigit = remainder;
-        } else {
-            calculatedValidDigit = (11 - remainder);
-        }
-
-        if (calculatedValidDigit != Character.getNumericValue(nationalCode.charAt(9))) {
-            System.out.println("Invalid National code");
-            return false;
-        }
-        return true;
 
     }
 }
