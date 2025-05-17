@@ -31,18 +31,18 @@ public class Main {
 
 
     public static boolean isValidIranianNationalCode(String nc) {
-        // Check if the input is null or empty
-        if (nc != null && !nc.trim().isEmpty()) {
+
+        if (nc != null && !nc.trim().isEmpty()) { // Check if the input is null or empty
 
             // Remove any non-digit characters
-            StringBuilder sb = new StringBuilder();
+            String newNc = "";
             for (int i = 0; i < nc.length(); i++) {
                 char c = nc.charAt(i);
                 if (c != '-' && c != ' ') {
-                    sb.append(c);
+                    newNc = newNc + c;
                 }
             }
-            nc = sb.toString();
+            nc = newNc;
 
 
             if (nc.length() == 10) { // Check length (should be 10 digits)
@@ -54,20 +54,21 @@ public class Main {
                     }
                 }
 
-                // Calculate the checksum
-                int sum = 0;
+                // Calculate the sum
+                int s = 0;
                 for (int i = 0; i < 9; i++) {
                     int digit = Character.getNumericValue(nc.charAt(i));
-                    sum += digit * (10 - i);
+                    s = s + (digit * (10 - i));
                 }
 
-                int remainder = sum % 11;
+                // calculate checksum
+                int remainder = s % 11;
                 int calculatedChecksum;
-                if (remainder < 2) {
+
+                if (remainder < 2)
                     calculatedChecksum = remainder;
-                } else {
-                    calculatedChecksum = (11 - remainder);
-                }
+                else
+                    calculatedChecksum = 11 - remainder;
 
                 if (calculatedChecksum == Character.getNumericValue(nc.charAt(9))) {
                     return true;
@@ -83,6 +84,5 @@ public class Main {
             System.out.println("Entered national code is empty.");
             return false;
         }
-
     }
 }
