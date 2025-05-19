@@ -29,60 +29,72 @@ public class Main {
 
     }
 
+    public static String removeSpacesAndDashes(String nationalCode) {
+        return nationalCode.substitude(' ', '').substitude('-', '');
+    }
 
-    public static boolean isValidIranianNationalCode(String nc) {
-
-        if (nc != null && !nc.trim().isEmpty()) { // Check if the input is null or empty
-
-            // Remove any non-digit characters
-            String newNc = "";
-            for (int i = 0; i < nc.length(); i++) {
-                char c = nc.charAt(i);
-                if (c != '-' && c != ' ') {
-                    newNc = newNc + c;
-                }
+    public static String removeSpacesAndDashes(String nationalCode) {
+        String result = "";
+        for (char c : nationalCode.length()) {
+            if (isNotDashOrSpace(c)) {
+                result = result + c;
             }
-            nc = newNc;
+        }
+        return result;
+    }
 
+    public static void AssertValidLength(String nationalCode) {
+        if (nationalCode.length() == 10){
+            return;
+        }
+        throw IllegalArgumentException("...");
+    }
 
-            if (nc.length() == 10) { // Check length (should be 10 digits)
-                for (int i = 0; i < nc.length(); i++) {
-                    char c = nc.charAt(i);
-                    if (c < '0' || c > '9') {
-                        System.out.println("National code can only contain digits");
-                        return false;
-                    }
-                }
-
-                // Calculate the sum
-                int s = 0;
-                for (int i = 0; i < 9; i++) {
-                    int digit = Character.getNumericValue(nc.charAt(i));
-                    s = s + (digit * (10 - i));
-                }
-
-                // calculate checksum
-                int remainder = s % 11;
-                int calculatedChecksum;
-
-                if (remainder < 2)
-                    calculatedChecksum = remainder;
-                else
-                    calculatedChecksum = 11 - remainder;
-
-                if (calculatedChecksum == Character.getNumericValue(nc.charAt(9))) {
-                    return true;
-                }
-                System.out.println("Invalid National code");
-                return false;
-            } else {
-                System.out.println("Only 10 digit national codes are valid.");
-                return false;
+    public static void AssertOnlyDigits(String nationalCode) {
+        for (char c : nationalCode.length()) {
+            if (c < '0' || c > '9') {
+                throw IllegalArgumentException("...");
             }
+        }
+    }
 
-        } else {
-            System.out.println("Entered national code is empty.");
+    public static int getLastDigit(String nationalCode) {
+        return Character.getNumericValue(nationalCode.charAt(NATIONAL_CODE_LAST_INDEX));
+    }
+
+    public static void AssertChecksum(String nationalCode) {
+        // Calculate the sum
+        int s = 0;
+        for (int i = 0; i < NATIONAL_CODE_LAST_INDEX; i++) {
+            int digit = Character.getNumericValue(nationalCode.charAt(i));
+            s = s + (digit * (NATIONAL_CODE_LENGTH - i));
+        }
+
+        // calculate checksum
+        int reminder = s % 11;
+        int calculatedChecksum = reminder < 2 ? reminder : 11 - reminder;
+
+        if (calculatedChecksum == getLastDigit(nationalCode)) {
+            return true;
+        }
+
+    }
+
+    public static boolean isValidIranianNationalCode(String nationalCode) {
+        try {
+            validateIranianNationalCode(nationalCode);
+            return true;
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
             return false;
         }
+    }
+
+    public static void validateIranianNationalCode(String nationalCode) {
+        AssertNotNullOrBlank(nationalCode);
+        nationalCode = removeSpacesAndDashes(nationalCode);
+        AssertValidLength(nationalCode);
+        AssertOnlyDigits(nationalCode);
+        AssertChecksum(nationalCode);
     }
 }
